@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module
+	version="2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	
+	<info 
+		organisation="${project.organisation}"
+		module="${project.module}"
+		revision="${project.revision}" />
+	
+	<configurations>
+	    <conf name="compile" visibility="private" description="Compiler stuff"/>
+		<conf name="runtime" visibility="public" description="Runtime dependencies"/>
+		<conf name="test" visibility="private" extends="runtime" description="Testing dependencies" />
+	</configurations>
+	
+	<dependencies>
+	    <!-- Compiler dependencies -->
+        <dependency org="org.scala-lang" name="scala-compiler" rev="2.9.1" />
+        
+        <dependency org="net.sf" name="picard" rev="1.67.1197"/>
+        <dependency org="net.sf" name="sam" rev="1.67.1197"/>
+        
+        <!-- Runtime dependencies -->
+        <!-- Scala runtime -->
+        <dependency org="org.scala-lang" name="scala-library" rev="2.9.1" />
+        <dependency org="org.scala-lang" name="scala-dbc" rev="2.9.1" />
+        <dependency org="org.scala-lang" name="scala-swing" rev="2.9.1" />
+        <!-- Spring framework -->
+        <!-- <dependency org="org.springframework" name="org.springframework.context" rev="3.1.1.RELEASE" /> -->
+        <!-- Logging frameworks -->
+        <dependency org="org.slf4j" name="slf4j-api" rev="1.6.4" />
+        <dependency org="ch.qos.logback" name="logback-classic" rev="1.0.0" />
+        
+        <!-- Testing dependencies -->
+        <dependency org="org.scalatest" name="scalatest" rev="1.3" />
+        <dependency org="org.junit" name="com.springsource.org.junit" rev="4.10.0" />
+	</dependencies>
+</ivy-module>

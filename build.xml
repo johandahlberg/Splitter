@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="template-project" default="build-release"
+  xmlns:ivy="antlib:org.apache.ivy.ant">
+  <!-- =============================================================================== 
+    The Properties section - edit these values if you are unhappy with the project 
+    layout =============================================================================== -->
+  <property file="${basedir}/build.properties"/>
+  
+  <property name="project.dir" value="${basedir}/.." />
+  <property name="ivy.install.version" value="2.2.0" />
+  <property name="ivy.jar.dir" value="${project.dir}/ivy" />
+
+
+  <property name="build.dir" value="${project.dir}/build" />
+  <property name="src.dir" value="main/packages" />
+  <property name="lib.dir" value="${project.dir}/lib" />
+  <property name="ivyreport.dir" value="${build.dir}/report" />
+  <property name="test.dir" value="test/packages" />
+  <property name="build.jar" value="${project.jarfile}.jar" />
+  <property name="src.jar" value="${project.jarfile}.src.jar" />
+
+  <!-- =============================================================================== 
+    The ivy section - downloads and configures everything you need to run the 
+    project ****** note: to add more repositories add them to ivysettings.xml 
+    to add more dependancyies add them to ivy.xml ****** =============================================================================== -->
+  <target name="download-ivy" unless="skip.download">
+    <mkdir dir="${ivy.jar.dir}" />
+    <!-- download Ivy from web site so that it can be used even without any 
+      special installation -->
+    <echo message="installing ivy..." />
+    <get
+      src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+      dest="${ivy.jar.dir}/ivy.jar" usetimestamp="true" />
+  </target>
+
+  <target name="install-ivy" depends="download-ivy" description="--> install ivy">
+    <!-- try to load ivy here from local ivy dir, in case the user has not 
+      already dropped it into ant's lib dir (note that the latter copy will always 
+      take precedence). We will not fail as long as local lib dir exists (it may 
+      be empty) and ivy is in at least one of ant's lib dir or the local lib dir. -->
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar" />
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant"
+      classpathref="ivy.lib.path" />
+  </target>
+
+  <!-- =============================================================================== 
+    the init function. Specifys the retreive location and specifyes where the 
+    libraries are loaded from Also creates the source directories if they dont 
+    already exist =============================================================================== -->
+  <target name="init" depends="install-ivy">
+    <mkdir dir="${lib.dir}" />
+    <mkdir dir="${src.dir}" />
+    <mkdir dir="${test.dir}" />
+    <mkdir dir="${build.dir}" />
+    <ivy:configure file="ivysettings.xml" />
+    <ivy:retrieve pattern="${lib.dir}/[type]/[artifact].[ext]" />
+    <property name="scala-library.jar" value="${lib.dir}/jar/scala-library.jar" />
+    <path id="build.classpath">
+      <fileset dir="${lib.dir}">
+        <include name="**/*.jar" />
+      </fileset>
+
+      <pathelement location="${build.dir}" />
+    </path>
+
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath>
+        <pathelement location="${lib.dir}/jar/scala-compiler.jar" />
+        <pathelement location="${scala-library.jar}" />
+      </classpath>
+    </taskdef>
+  </target>
+
+  <target name="compile-java" depends="init">
+    <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" includeantruntime="false" >
+      <include name="**/*.java" />
+    </javac>
+  </target>
+  
+  <target name="compile-scala" depends="init">
+    <scalac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath">
+      <include name="**/*.scala" />
+    </scalac>
+  </target>
+  
+  <target name="compile" depends="compile-java,compile-scala" />
+
+  <target name="jar" depends="compile"
+    description="o Creates a JAR file for this package">
+    <manifestclasspath property="dist.manifest.classpath"
+      jarfile="${build.dir}/${build.jar}">
+      <classpath refid="build.classpath" />
+    </manifestclasspath>
+
+    <!-- Binaries -->
+    <jar destfile="${build.dir}/${build.jar}" excludes="**/package.html"
+      basedir="${build.dir}" includes="**/*.class">
+      <fileset dir="${src.dir}">
+        <include name="**/*" />
+      </fileset>
+      <fileset dir="${src.dir}" includes="*.*" />
+      <!-- uncomment this if you want all lib jars be copied into dest jar (wont 
+        do much - you still need to run it with java -jar somejar.jar to run anyway 
+        <zipfileset dir="${lib.dir}"> <include name="**/*.jar"/> </zipfileset> -->
+      <manifest>
+        <attribute name="Main-Class" value="${project.mainclass}" />
+        <attribute name="Class-Path" value="${dist.manifest.classpath}" />
+      </manifest>
+    </jar>
+    
+    <!-- Source code -->
+    <jar destfile="${build.dir}/${src.jar}">
+        <fileset dir="${src.dir}" includes="**/*"/>
+    </jar>
+  </target>
+
+  <target name="report" depends="init">
+      <mkdir dir="${ivyreport.dir}" />
+      <ivy:resolve />
+      <ivy:report todir="${ivyreport.dir}" />
+  </target>
+
+  <target name="test-compile" depends="compile">
+    <javac srcdir="${test.dir}" destdir="${build.dir}" classpathref="build.classpath">
+      <include name="**/*.java" />
+    </javac>
+    <scalac srcdir="${test.dir}" destdir="${build.dir}"
+      classpathref="build.classpath">
+      <include name="**/*.scala" />
+    </scalac>
+  </target>
+  
+  <target name="test" depends="test-compile">
+    <taskdef name="scalatest" classname="org.scalatest.tools.ScalaTestAntTask">
+      <classpath refid="build.classpath" />
+    </taskdef>
+
+    <scalatest parallel="true">
+      <reporter type="stdout" />
+      <reporter type="file" filename="${build.dir}/test.out" />
+      <reporter type="graphic" />
+
+      <suite classname="ldc.unfuse.GrepTest" />
+    </scalatest>
+
+  </target>
+  
+  <!-- ================================= target: build-release ================================= -->
+  <target name="build-release" depends="compile,jar,report" />
+  
+  <!-- ================================= target: clean ================================= -->
+  <target name="clean" depends="clean-cache" description="--> clean the project">
+    <delete includeemptydirs="true" quiet="true">
+      <fileset dir="${build.dir}" />
+    </delete>
+  </target>
+  
+  <!-- ================================= target: clean-ivy ================================= -->
+  <target name="clean-ivy" description="--> clean the ivy installation">
+    <delete dir="${ivy.jar.dir}" />
+  </target>
+  
+  <!-- ================================= target: clean-cache ================================= -->
+  <target name="clean-cache" depends="install-ivy" description="--> clean the ivy cache">
+    <ivy:cleancache />
+  </target>
+  
+</project>
