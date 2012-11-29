@@ -105,12 +105,7 @@
         <attribute name="Main-Class" value="${project.mainclass}" />
         <attribute name="Class-Path" value="${dist.manifest.classpath}" />
       </manifest>
-    </jar>
-    
-    <!-- Source code -->
-    <jar destfile="${build.dir}/${src.jar}">
-        <fileset dir="${src.dir}" includes="**/*"/>
-    </jar>
+    </jar>    
   </target>
 
   <target name="report" depends="init">
