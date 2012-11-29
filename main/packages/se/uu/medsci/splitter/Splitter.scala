@@ -8,23 +8,55 @@ import net.sf.picard.fastq.FastqReader
 import net.sf.picard.fastq.FastqRecord
 import se.uu.medsci.splitter.sam.SplitterSAMFileWriterFactory
 import se.uu.medsci.splitter.fastq.SplitterFastqFileWriterFactory
+import scopt.mutable
 
 object Splitter extends App {
 
   private val logger = LoggerFactory.getLogger(classOf[App]);
 
-  logger.info("Hello world splitter!");
+  private val defaultNbrOfRecordsPerFile: Int = 100000;
 
-  val inputBamFile = new File("resources/exampleBAM.bam");
-  val inputFastQFile = new File("resources/exampleFastq.fastq.gz");
+  class Config {
+    var inputFile: File = _
+    var outputDir: File = _
+    var recordsPerOutputFile: Int = -1
+  }
 
-  logger.info("Splitting fastq")
-  val fastqFileSplitter = SimpleFileSplitter.newFileSplitter(inputFastQFile, "fastq")
-  val fastqOutputFiles = fastqFileSplitter.split(10);
-  
-  logger.info("Splitting bam")
-  val bamFileSplitter = SimpleFileSplitter.newFileSplitter(inputBamFile, "bam")
-  val bamOutputFiles = bamFileSplitter.split(10);
-  logger.info("The output files were: " + bamOutputFiles)
+  val config: Config = new Config
+
+  val parser = new scopt.mutable.OptionParser("Splitter") {
+    opt("i", "input", "<file>", "Path to input file to split", { v: String => config.inputFile = new File(v) })
+    opt("d", "output_dir", "<dir>", "Path to dir for output files.", { v: String => config.outputDir = new File(v) })
+    intOpt("r", "records_per_file", "Number of records to output per file. 100000 is default.", { v: Int => config.recordsPerOutputFile = v })
+  }
+
+  // Parse arguments and start operations.
+  if ((!args.isEmpty) && parser.parse(args) && parseArguments(config)) {
+    logger.info("Starting the file splitter.")
+    runFileSplitter(config.inputFile, config.outputDir, config.recordsPerOutputFile)
+  } else {
+    // arguments are bad, usage message will have be displayed
+    logger.info(parser.usage)
+  }
+
+  private def runFileSplitter(inputFile: File, outputDir: File, recordsPerFile: Int) = {
+
+    val fastqFileSplitter = SimpleFileSplitter.newFileSplitter(inputFile, outputDir.getAbsolutePath() + "/" + config.inputFile.getName)
+    val fastqOutputFiles = fastqFileSplitter.split(recordsPerFile);
+
+  }
+
+  private def parseArguments(config: Config): Boolean = {       
+    if (config.inputFile == null) {
+      return false
+    } else if (config.recordsPerOutputFile < 1) {
+      logger.info("Number of records per file was not specified. Setting it to default of: " + defaultNbrOfRecordsPerFile)
+      config.recordsPerOutputFile = defaultNbrOfRecordsPerFile
+    } else if (config.outputDir == null || !config.outputDir.isDirectory()) {
+      logger.info("output_dir is not a directory.")
+      return false
+    }
+    return true
+  }
 
 }

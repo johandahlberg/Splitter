@@ -2,9 +2,9 @@ package se.uu.medsci.splitter.sam
 
 import net.sf.samtools._
 import org.slf4j.LoggerFactory
-import se.uu.medsci.splitter.Writer
+import se.uu.medsci.splitter.SplitterWriter
 
-class SplitterSAMFileWriter(samFileWriter: SAMFileWriter) extends Writer[SAMRecord] {
+class SplitterSAMFileWriter(samFileWriter: SAMFileWriter) extends SplitterWriter[SAMRecord] {
 
     private val logger = LoggerFactory.getLogger(classOf[SplitterSAMFileWriter]);
 

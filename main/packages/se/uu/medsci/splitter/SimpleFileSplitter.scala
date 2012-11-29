@@ -18,14 +18,13 @@ import collection.JavaConversions._
 class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: SplitterFileWriterFactory[T], outputFileNamePrefix: String) extends FileSplitter {
 
   val logger = LoggerFactory.getLogger(classOf[SimpleFileSplitter[T]]);
-  logger.info("Initiating the file splitter");
 
   /**
    * Split the the file for the input interator to files of size of desiredFileSize,
    * outputting new files with file names as specified by outputFileNamePrefix
    */
   def split(numberOfRecordsPerFile: Long): List[File] = {
-    logger.info("Splitting");
+    logger.debug("Splitting");
     // Counters    
     var index: Int = 1;
     var recordsProcessed = 0;
@@ -35,7 +34,7 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
     var listOfOutputFiles: List[File] = List(outputFile);
 
     // Initializing a file writer
-    var fileWriter: Writer[T] = writerFactor.createNewWriter(outputFile);
+    var fileWriter: SplitterWriter[T] = writerFactor.createNewWriter(outputFile);
 
     // Iterator over all records in the input file and write to the output file
     // while the file size is under the desired size.
@@ -60,7 +59,7 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
 
     fileWriter.close();
 
-    logger.info("Finished processing. Processed a total of " + recordsProcessed + " records processed. And created " + index + " new files.");
+    logger.debug("Finished processing. Processed a total of " + recordsProcessed + " records processed. And created " + index + " new files.");
 
     // Return the list of output files.
     listOfOutputFiles
@@ -74,20 +73,21 @@ object SimpleFileSplitter {
   def newFileSplitter(inputFile: File, outputFilesPrefix: String): FileSplitter =
     {
 
+      println(outputFilesPrefix)
+
       val nameOfTheFile = inputFile.getName()
 
       val splitter =
         if (nameOfTheFile.matches(""".*\.fastq\.gz""")) {
           val iterableFastqFileReader: Iterable[FastqRecord] = new FastqReader(inputFile)
           val fastqWriterFastqFactory: SplitterFileWriterFactory[FastqRecord] = new SplitterFastqFileWriterFactory();
-          new SimpleFileSplitter[FastqRecord](iterableFastqFileReader, fastqWriterFastqFactory, "fastqFilesBaseName")
+          new SimpleFileSplitter[FastqRecord](iterableFastqFileReader, fastqWriterFastqFactory, outputFilesPrefix)
         } else if ((nameOfTheFile.matches(""".*\.bam"""))) {
           val iterableFileReader: SAMFileReader = new SAMFileReader(inputFile);
           val header: SAMFileHeader = iterableFileReader.getFileHeader();
           val writerFactory: SplitterFileWriterFactory[SAMRecord] = new SplitterSAMFileWriterFactory(header, false);
-          new SimpleFileSplitter[SAMRecord](iterableFileReader, writerFactory, "testFileWithOtherName");
-        }
-        else
+          new SimpleFileSplitter[SAMRecord](iterableFileReader, writerFactory, outputFilesPrefix);
+        } else
           throw new Exception("Did not recognize file type of input file: " + inputFile)
 
       splitter

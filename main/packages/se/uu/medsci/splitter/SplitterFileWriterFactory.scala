@@ -4,6 +4,6 @@ import java.io.File
 
 trait SplitterFileWriterFactory[T] {
     
-    def createNewWriter(file: File): Writer[T]
+    def createNewWriter(file: File): SplitterWriter[T]
     
 }
