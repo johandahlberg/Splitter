@@ -6,7 +6,8 @@
     
     <resolvers>
         <chain name="chained">
-            <ibiblio name="Scala-Tools Maven2 Repository" root="http://scala-tools.org/repo-releases" m2compatible="true" />
+            <ibiblio name="Scala-Tools Maven2 Repository" root="http://scala-tools.org/repo-releases" m2compatible="true" />            
+            
             <url name="com.springsource.repository.bundles.release">
                 <ivy pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
                 <artifact pattern="http://repository.springsource.com/ivy/bundles/release/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
