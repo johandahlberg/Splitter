@@ -97,7 +97,7 @@
     <!-- Binaries -->
     <jar destfile="${build.dir}/${build.jar}" excludes="**/package.html"
       basedir="${build.dir}" includes="**/*.class">
-      <fileset dir="${src.dir}" includes="*.*" /> -->
+      <fileset dir="${src.dir}" includes="*.*" />
       <!-- uncomment this if you want all lib jars be copied into dest jar (wont 
         do much - you still need to run it with java -jar somejar.jar to run anyway 
         <zipfileset dir="${lib.dir}"> <include name="**/*.jar"/> </zipfileset> -->
