@@ -6,12 +6,12 @@
     layout =============================================================================== -->
   <property file="${basedir}/build.properties"/>
   
-  <property name="project.dir" value="${basedir}/.." />
+  <property name="project.dir" value="${basedir}" />
   <property name="ivy.install.version" value="2.2.0" />
   <property name="ivy.jar.dir" value="${project.dir}/ivy" />
 
 
-  <property name="build.dir" value="${project.dir}/build" />
+  <property name="build.dir" value="${project.dir}/bin" />
   <property name="src.dir" value="main/packages" />
   <property name="lib.dir" value="${project.dir}/lib" />
   <property name="ivyreport.dir" value="${build.dir}/report" />
@@ -97,10 +97,7 @@
     <!-- Binaries -->
     <jar destfile="${build.dir}/${build.jar}" excludes="**/package.html"
       basedir="${build.dir}" includes="**/*.class">
-      <fileset dir="${src.dir}">
-        <include name="**/*" />
-      </fileset>
-      <fileset dir="${src.dir}" includes="*.*" />
+      <fileset dir="${src.dir}" includes="*.*" /> -->
       <!-- uncomment this if you want all lib jars be copied into dest jar (wont 
         do much - you still need to run it with java -jar somejar.jar to run anyway 
         <zipfileset dir="${lib.dir}"> <include name="**/*.jar"/> </zipfileset> -->
