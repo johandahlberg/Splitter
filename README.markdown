@@ -6,6 +6,7 @@ There is often a need to split files into smaller chuncks when working in bioinf
 Usage
 -----
 
+`
 Usage: Splitter [options] 
 
   -i <file> | --input <file>
@@ -14,6 +15,7 @@ Usage: Splitter [options]
         Path to dir for output files.
   -r <value> | --records_per_file <value>
         Number of records to output per file. 100000 is default.
+`
 
 TODOs
 -----
