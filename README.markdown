@@ -6,16 +6,14 @@ There is often a need to split files into smaller chuncks when working in bioinf
 Usage
 -----
 
-`
-Usage: Splitter [options] 
+	Usage: Splitter [options] 
 
-  -i <file> | --input <file>
-        Path to input file to split
-  -d <dir> | --output_dir <dir>
-        Path to dir for output files.
-  -r <value> | --records_per_file <value>
-        Number of records to output per file. 100000 is default.
-`
+	  -i <file> | --input <file>
+	        Path to input file to split
+	  -d <dir> | --output_dir <dir>
+	        Path to dir for output files.
+	  -r <value> | --records_per_file <value>
+	        Number of records to output per file. 100000 is default.
 
 TODOs
 -----
