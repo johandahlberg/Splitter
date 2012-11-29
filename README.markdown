@@ -20,3 +20,6 @@ TODOs
 * Implement tests
 * Add support for more formats, e.g. vcf
 
+License
+-------
+MIT License.
