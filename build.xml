@@ -16,7 +16,7 @@
   <property name="lib.dir" value="${project.dir}/lib" />
   <property name="ivyreport.dir" value="${build.dir}/report" />
   <property name="test.dir" value="test/packages" />
-  <property name="build.jar" value="${project.jarfile}.jar" />
+  <property name="build.jar" value="${project.jarfile}" />
   <property name="src.jar" value="${project.jarfile}.src.jar" />
 
   <!-- =============================================================================== 
