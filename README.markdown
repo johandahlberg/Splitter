@@ -5,6 +5,7 @@ There is often a need to split files into smaller chuncks when working in bioinf
 
 Usage
 -----
+`java -jar <path to Splitter.jar> <options>`
 
 	Usage: Splitter [options] 
 
