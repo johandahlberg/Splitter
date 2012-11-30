@@ -89,21 +89,26 @@
 
   <target name="jar" depends="compile"
     description="o Creates a JAR file for this package">
-    <manifestclasspath property="dist.manifest.classpath"
+    
+    <pathconvert property="jar.classpath" pathsep=" ">
+        <fileset dir="${lib.dir}" includes="jar/*.jar"/>
+    </pathconvert>
+  	
+  	<manifestclasspath property="dist.manifest.classpath"
       jarfile="${build.dir}/${build.jar}">
       <classpath refid="build.classpath" />
     </manifestclasspath>
-
+  	
     <!-- Binaries -->
     <jar destfile="${build.dir}/${build.jar}" excludes="**/package.html"
       basedir="${build.dir}" includes="**/*.class">
       <fileset dir="${src.dir}" includes="*.*" />
       <!-- uncomment this if you want all lib jars be copied into dest jar (wont 
-        do much - you still need to run it with java -jar somejar.jar to run anyway 
-        <zipfileset dir="${lib.dir}"> <include name="**/*.jar"/> </zipfileset> -->
+        do much - you still need to run it with java -jar somejar.jar to run anyway --> 
+        <zipfileset dir="${lib.dir}"> <include name="jar/*.jar"/> </zipfileset> 
       <manifest>
         <attribute name="Main-Class" value="${project.mainclass}" />
-        <attribute name="Class-Path" value="${dist.manifest.classpath}" />
+        <attribute name="Class-Path" value="${jar.classpath}" />
       </manifest>
     </jar>    
   </target>
