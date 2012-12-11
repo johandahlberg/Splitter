@@ -15,7 +15,7 @@ import collection.JavaConversions._
  * T is a record class, for example a SAMRecord which can be written to a file by
  * a writer of class K.
  */
-class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: SplitterFileWriterFactory[T], outputFileNamePrefix: String) extends FileSplitter {
+class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: SplitterFileWriterFactory[T], outputFileNamePrefix: String, outputFileNamePostFix: String) extends FileSplitter {
 
     val logger = LoggerFactory.getLogger(classOf[SimpleFileSplitter[T]]);
 
@@ -30,7 +30,9 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
         var recordsProcessed = 0;
 
         // Files and file lists
-        var outputFile: File = new File(outputFileNamePrefix + "." + index);
+        val outputBaseName: String = outputFileNamePrefix.replace(outputFileNamePostFix, "")
+        def getFilenameWithIndex = new File(outputBaseName + "." + index + outputFileNamePostFix);
+        var outputFile: File = getFilenameWithIndex
         var listOfOutputFiles: List[File] = List(outputFile);
 
         // Initializing a file writer
@@ -52,7 +54,7 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
                 if (recordsProcessed == numberOfRecordsPerFile * index) {
 
                     index = index + 1;
-                    outputFile = new File(outputFileNamePrefix + "." + index);
+                    outputFile = getFilenameWithIndex
 
                     // If the write has a buffer, make sure this is passed along to the next writer.
                     fileWriter = if (fileWriter.isInstanceOf[Bufferable[T]])
@@ -60,7 +62,6 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
                     else {
                         fileWriter.close();
                         writerFactor.createNewWriter(outputFile);
-
                     }
 
                     listOfOutputFiles = outputFile :: listOfOutputFiles;
@@ -110,12 +111,12 @@ object SimpleFileSplitter {
                 if (nameOfTheFile.matches(""".*\.fastq\.gz""")) {
                     val iterableFastqFileReader: Iterable[FastqRecord] = new FastqReader(inputFile)
                     val fastqWriterFastqFactory: SplitterFileWriterFactory[FastqRecord] = new SplitterFastqFileWriterFactory();
-                    new SimpleFileSplitter[FastqRecord](iterableFastqFileReader, fastqWriterFastqFactory, outputFilesPrefix)
+                    new SimpleFileSplitter[FastqRecord](iterableFastqFileReader, fastqWriterFastqFactory, outputFilesPrefix, ".fastq.gz")
                 } else if ((nameOfTheFile.matches(""".*\.bam"""))) {
                     val iterableFileReader: SAMFileReader = new SAMFileReader(inputFile);
                     val header: SAMFileHeader = iterableFileReader.getFileHeader();
                     val writerFactory: SplitterFileWriterFactory[SAMRecord] = new SplitterSAMFileWriterFactory(header, false);
-                    new SimpleFileSplitter[SAMRecord](iterableFileReader, writerFactory, outputFilesPrefix);
+                    new SimpleFileSplitter[SAMRecord](iterableFileReader, writerFactory, outputFilesPrefix, ".bam");
                 } else
                     throw new Exception("Did not recognize file type of input file: " + inputFile)
 
