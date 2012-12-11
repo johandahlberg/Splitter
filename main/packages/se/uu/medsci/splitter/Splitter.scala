@@ -21,6 +21,7 @@ object Splitter extends App {
     var outputDir: File = _
     var listOfOutputFile: File = _
     var recordsPerOutputFile: Int = -1
+    var isPairedEnd: Boolean = true
   }
 
   val config: Config = new Config
@@ -30,6 +31,7 @@ object Splitter extends App {
     opt("d", "output_dir", "<dir>", "Path to dir for output files.", { v: String => config.outputDir = new File(v) })
     opt("l", "list", "<file>", "List of output files.", { v: String => config.listOfOutputFile = new File(v) })
     intOpt("r", "records_per_file", "Number of records to output per file. 100000 is default.", { v: Int => config.recordsPerOutputFile = v })
+    booleanOpt("pe", "If splitting a bam file use to indicate that the data is paired. If you are splitting a file with single end data, set to false. Default is true.", { v: Boolean => config.isPairedEnd = v })   
   }
 
   // Parse arguments and start operations.
@@ -43,7 +45,7 @@ object Splitter extends App {
 
   private def runFileSplitter(inputFile: File, outputDir: File, recordsPerFile: Int, outputFilesList: File) = {
 
-    val fastqFileSplitter = SimpleFileSplitter.newFileSplitter(inputFile, outputDir.getAbsolutePath() + "/" + config.inputFile.getName)
+    val fastqFileSplitter = SimpleFileSplitter.newFileSplitter(inputFile, outputDir.getAbsolutePath() + "/" + config.inputFile.getName, config.isPairedEnd)
     val fastqOutputFiles = fastqFileSplitter.split(recordsPerFile);    
     
     writeOutputList(outputFilesList, fastqOutputFiles)

@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory
 import se.uu.medsci.splitter.SplitterWriter
 import se.uu.medsci.splitter.Bufferable
 
-class SplitterSAMFileWriter(samFileWriter: SAMFileWriter, buffer: Iterable[SAMRecord]) extends SplitterWriter[SAMRecord] with Bufferable[SAMRecord] {
+class SplitterPairEndSAMFileWriter(samFileWriter: SAMFileWriter, buffer: Iterable[SAMRecord]) extends SplitterSAMFileWriter with Bufferable[SAMRecord] {
     
     def this(samFileWriter: SAMFileWriter) =
         this(samFileWriter, Iterable[SAMRecord]())
 
-    private val logger = LoggerFactory.getLogger(classOf[SplitterSAMFileWriter]);
+    private val logger = LoggerFactory.getLogger(classOf[SplitterPairEndSAMFileWriter]);
     
     //Accept the buffer of SAMRecords and convert it to a map with the read name as key
     private val pairsFound: scala.collection.mutable.Map[String, SAMRecord] = {     

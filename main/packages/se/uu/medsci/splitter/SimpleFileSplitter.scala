@@ -102,7 +102,7 @@ object SimpleFileSplitter {
     /**
      * Factory method trying to determine the file type of the input file dynamically and returning a appropriate FileSplitter
      */
-    def newFileSplitter(inputFile: File, outputFilesPrefix: String): FileSplitter =
+    def newFileSplitter(inputFile: File, outputFilesPrefix: String, isPairedEnd: Boolean): FileSplitter =
         {
 
             val nameOfTheFile = inputFile.getName()
@@ -115,7 +115,7 @@ object SimpleFileSplitter {
                 } else if ((nameOfTheFile.matches(""".*\.bam"""))) {
                     val iterableFileReader: SAMFileReader = new SAMFileReader(inputFile);
                     val header: SAMFileHeader = iterableFileReader.getFileHeader();
-                    val writerFactory: SplitterFileWriterFactory[SAMRecord] = new SplitterSAMFileWriterFactory(header, false);
+                    val writerFactory: SplitterFileWriterFactory[SAMRecord] = new SplitterSAMFileWriterFactory(header, false, isPairedEnd);
                     new SimpleFileSplitter[SAMRecord](iterableFileReader, writerFactory, outputFilesPrefix, ".bam");
                 } else
                     throw new Exception("Did not recognize file type of input file: " + inputFile)
