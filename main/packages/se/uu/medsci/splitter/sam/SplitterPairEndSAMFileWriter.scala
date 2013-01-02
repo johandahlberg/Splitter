@@ -4,19 +4,20 @@ import net.sf.samtools._
 import org.slf4j.LoggerFactory
 import se.uu.medsci.splitter.SplitterWriter
 import se.uu.medsci.splitter.Bufferable
+import java.io.File
 
-class SplitterPairEndSAMFileWriter(samFileWriter: SAMFileWriter, buffer: Iterable[SAMRecord]) extends SplitterSAMFileWriter with Bufferable[SAMRecord] {
-    
-    def this(samFileWriter: SAMFileWriter) =
-        this(samFileWriter, Iterable[SAMRecord]())
+class SplitterPairEndSAMFileWriter(samFileWriter: SAMFileWriter, file: File, buffer: Iterable[SAMRecord]) extends SplitterSAMFileWriter(samFileWriter, file) with Bufferable[SAMRecord] {
+
+    def this(samFileWriter: SAMFileWriter, file: File) =
+        this(samFileWriter, file, Iterable[SAMRecord]())
 
     private val logger = LoggerFactory.getLogger(classOf[SplitterPairEndSAMFileWriter]);
-    
+
     //Accept the buffer of SAMRecords and convert it to a map with the read name as key
-    private val pairsFound: scala.collection.mutable.Map[String, SAMRecord] = {     
+    private val pairsFound: scala.collection.mutable.Map[String, SAMRecord] = {
         val map: scala.collection.mutable.Map[String, SAMRecord] = scala.collection.mutable.Map()
-        for(rec <- buffer){
-           map += rec.getReadName() -> rec
+        for (rec <- buffer) {
+            map += rec.getReadName() -> rec
         }
         map
     }
@@ -34,24 +35,19 @@ class SplitterPairEndSAMFileWriter(samFileWriter: SAMFileWriter, buffer: Iterabl
         }
 
     }
-    
+
     def writeBuffer() {
-        for(rec <- pairsFound.values) {
+        for (rec <- pairsFound.values) {
             samFileWriter.addAlignment(rec)
         }
     }
-    
-    
+
     def bufferIsEmpty(): Boolean = {
         pairsFound.isEmpty
     }
-    
+
     def getBuffer(): Iterable[SAMRecord] = {
         pairsFound.values
-    }
-
-    def close = {
-        samFileWriter.close()
     }
 
 }

@@ -7,14 +7,19 @@ Usage
 -----
 `java -jar <path to Splitter.jar> <options>`
 
+
 	Usage: Splitter [options] 
 
 	  -i <file> | --input <file>
 	        Path to input file to split
 	  -d <dir> | --output_dir <dir>
 	        Path to dir for output files.
+	  -l <file> | --list <file>
+	        List of output files.
 	  -r <value> | --records_per_file <value>
 	        Number of records to output per file. 100000 is default.
+	  --pe <value>
+	        If splitting a bam file use to indicate that the data is paired. If you are splitting a file with single end data, set to false. Default is true.
 
 TODOs
 -----
