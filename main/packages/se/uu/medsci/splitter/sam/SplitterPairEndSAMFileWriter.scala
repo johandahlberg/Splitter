@@ -37,8 +37,11 @@ class SplitterPairEndSAMFileWriter(samFileWriter: SAMFileWriter, file: File, buf
     }
 
     def writeBuffer() {
-        for (rec <- pairsFound.values) {
+        for ((name, rec) <- pairsFound) {
             samFileWriter.addAlignment(rec)
+            // Remove the reads as they are written, as to fulfill logically expected behavior that when a
+            // buffer has been written, it should be empty,
+            pairsFound.remove(name)
         }
     }
 

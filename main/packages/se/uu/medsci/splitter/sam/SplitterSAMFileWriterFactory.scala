@@ -4,6 +4,7 @@ import net.sf.samtools._
 import java.io.File
 import se.uu.medsci.splitter.SplitterFileWriterFactory
 import se.uu.medsci.splitter.SplitterWriter
+import se.uu.medsci.splitter.SplitterException
 
 class SplitterSAMFileWriterFactory(header: SAMFileHeader, presorted: Boolean, isPariedEnd: Boolean) extends SAMFileWriterFactory with SplitterFileWriterFactory[SAMRecord] {
 
@@ -28,7 +29,7 @@ class SplitterSAMFileWriterFactory(header: SAMFileHeader, presorted: Boolean, is
         if (isPariedEnd)
             new SplitterPairEndSAMFileWriter(super.makeBAMWriter(header, presorted, file), file, buffer)
         else
-            throw new Exception("Single end SAMFileWriter is not implemented for constructor with buffer.")
+            throw new SplitterException("Single end SAMFileWriter is not implemented for constructor with buffer.")
     }
 
 }

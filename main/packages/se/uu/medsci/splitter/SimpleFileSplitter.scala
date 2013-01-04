@@ -31,6 +31,7 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
 
         // Files and file lists
         val outputBaseName: String = outputFileNamePrefix.replace(outputFileNamePostFix, "")
+        // Function to build a file name with the correct index appended.
         def getFilenameWithIndex = new File(outputBaseName + "." + index + outputFileNamePostFix);
         var outputFile: File = getFilenameWithIndex
         var listOfOutputFiles: List[File] = List(outputFile);
@@ -41,28 +42,29 @@ class SimpleFileSplitter[T](inputFileIteratorHandle: Iterable[T], writerFactor: 
         // Iterator over all records in the input file and write to the output file
         // while the file size is under the desired size.
         val iterator = inputFileIteratorHandle.iterator;
-        while (iterator.hasNext) {
+        for (record <- iterator) {
             try {
                 recordsProcessed = recordsProcessed + 1;
 
                 // Write to the output file using abstract record reader.
-                val record: T = iterator.next();
+                //val record: T = iterator.next();
                 fileWriter.write(record);
 
                 // If the desired number of records have been passed to the file writer,
                 // create a new output file and file writer
-                if (recordsProcessed == numberOfRecordsPerFile * index) {
+                if (recordsProcessed == numberOfRecordsPerFile * index && iterator.hasNext) {
 
                     index = index + 1;
                     outputFile = getFilenameWithIndex
 
                     // If the write has a buffer, make sure this is passed along to the next writer.
-                    fileWriter = if (fileWriter.isInstanceOf[Bufferable[T]])
-                        checkBufferAndCloseFileWriter(fileWriter.asInstanceOf[SplitterWriter[T] with Bufferable[T]], outputFile)
-                    else {
-                        fileWriter.close();
-                        writerFactor.createNewWriter(outputFile);
-                    }
+                    fileWriter =
+                        if (fileWriter.isInstanceOf[Bufferable[T]])
+                            checkBufferAndCloseFileWriter(fileWriter.asInstanceOf[SplitterWriter[T] with Bufferable[T]], outputFile)
+                        else {
+                            fileWriter.close();
+                            writerFactor.createNewWriter(outputFile);
+                        }
 
                     listOfOutputFiles = outputFile :: listOfOutputFiles;
                 }
@@ -118,7 +120,7 @@ object SimpleFileSplitter {
                     val writerFactory: SplitterFileWriterFactory[SAMRecord] = new SplitterSAMFileWriterFactory(header, false, isPairedEnd);
                     new SimpleFileSplitter[SAMRecord](iterableFileReader, writerFactory, outputFilesPrefix, ".bam");
                 } else
-                    throw new Exception("Did not recognize file type of input file: " + inputFile)
+                    throw new SplitterException("Did not recognize file type of input file: " + inputFile)
 
             splitter
         }

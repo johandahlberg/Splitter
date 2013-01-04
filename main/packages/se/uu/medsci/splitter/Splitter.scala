@@ -8,11 +8,17 @@ import net.sf.picard.fastq.FastqReader
 import net.sf.picard.fastq.FastqRecord
 import se.uu.medsci.splitter.sam.SplitterSAMFileWriterFactory
 import se.uu.medsci.splitter.fastq.SplitterFastqFileWriterFactory
-import scopt.mutable
+//import scopt._
+import scopt.mutable.OptionParser
+
 
 object Splitter extends App {
 
-    private val logger = LoggerFactory.getLogger(classOf[App]);
+    /**
+     * Variables
+     */
+
+    lazy private val logger = LoggerFactory.getLogger(classOf[App]);
 
     private val defaultNbrOfRecordsPerFile: Int = 100000;
 
@@ -24,32 +30,43 @@ object Splitter extends App {
         var isPairedEnd: Boolean = true
     }
 
-    val config: Config = new Config
-
-    val parser = new scopt.mutable.OptionParser("Splitter") {
+    lazy val config: Config = new Config
+    
+    lazy val parser = new scopt.mutable.OptionParser("Splitter") {
         opt("i", "input", "<file>", "Path to input file to split", { v: String => config.inputFile = new File(v) })
-        opt("d", "output_dir", "<dir>", "Path to dir for output files.", { v: String => config.outputDir = new File(v) })
+        opt("o", "output_dir", "<dir>", "Path to dir for output files.", { v: String => config.outputDir = new File(v) })
         opt("l", "list", "<file>", "List of output files.", { v: String => config.listOfOutputFile = new File(v) })
         intOpt("r", "records_per_file", "Number of records to output per file. 100000 is default.", { v: Int => config.recordsPerOutputFile = v })
         booleanOpt("pe", "If splitting a bam file use to indicate that the data is paired. If you are splitting a file with single end data, set to false. Default is true.", { v: Boolean => config.isPairedEnd = v })
     }
 
-    // Parse arguments and start operations.
-    if ((!args.isEmpty) && parser.parse(args) && parseArguments(config)) {
-        logger.info("Starting the file splitter.")
-        runFileSplitter(config.inputFile, config.outputDir, config.recordsPerOutputFile, config.listOfOutputFile)
-    } else {
-        // arguments are bad, usage message will have be displayed
-        logger.info(parser.usage)
+    /**
+     * Running the App
+     */
+    run(args)
+    def run(args: Array[String]): List[File] = {
+        if ((!args.isEmpty) && parser.parse(args) && parseArguments(config)) {
+            logger.info("Starting the file splitter.")
+            val outputFiles = runFileSplitter(config.inputFile, config.outputDir, config.recordsPerOutputFile, config.listOfOutputFile)
+            outputFiles
+        } else {
+            // arguments are bad, usage message will be displayed
+            logger.info(parser.usage)
+            List()
+        }
     }
 
-    private def runFileSplitter(inputFile: File, outputDir: File, recordsPerFile: Int, outputFilesList: File) = {
+    /**
+     * Private help functions for parsing arguments
+     */
 
-        val fastqFileSplitter = SimpleFileSplitter.newFileSplitter(inputFile, outputDir.getAbsolutePath() + "/" + config.inputFile.getName, config.isPairedEnd)
-        val fastqOutputFiles = fastqFileSplitter.split(recordsPerFile);
+    private def runFileSplitter(inputFile: File, outputDir: File, recordsPerFile: Int, outputFilesList: File): List[File] = {
 
-        writeOutputList(outputFilesList, fastqOutputFiles)
+        val fileSplitter = SimpleFileSplitter.newFileSplitter(inputFile, outputDir.getAbsolutePath() + "/" + config.inputFile.getName, config.isPairedEnd)
+        val outputFiles = fileSplitter.split(recordsPerFile);
 
+        writeOutputList(outputFilesList, outputFiles)
+        outputFiles
     }
 
     private def parseArguments(config: Config): Boolean = {

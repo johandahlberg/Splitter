@@ -6,12 +6,11 @@ import java.io.File
 import net.sf.picard.sam.FixMateInformation
 import scala.collection.JavaConversions
 import net.sf.picard.sam.SplitterFixMatePairInformation
-import net.sf.picard.sam.SplitterFixMatePairInformation
 
 abstract class SplitterSAMFileWriter(samFileWriter: SAMFileWriter, file: File) extends SplitterWriter[SAMRecord] {
 
     /**
-     * Common close method for both single end and paried writer classes.
+     * Common close method for both single end and paired writer classes.
      */
     def close = {
         samFileWriter.close()
