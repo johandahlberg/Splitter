@@ -21,10 +21,26 @@ Usage
 	  --pe <value>
 	        If splitting a bam file use to indicate that the data is paired. If you are splitting a file with single end data, set to false. Default is true.
 
+
+Building
+--------
+Build using `ant`
+
+Testing
+-------
+Build and run tests using `ant test`
+
 TODOs
 -----
 * Implement tests
+	- Some basic tests are implemented, but more wouldn't hurt
 * Add support for more formats, e.g. vcf
+
+Credits
+-------
+Project setup from using the [java-scala-ivy-template](https://github.com/zsellera/java-scala-ivy-template).
+Command line arguments are parsed using [scopt](https://github.com/scopt/scopt).
+Uses [Picard](http://picard.sourceforge.net/) for a lot of the file parsing.
 
 License
 -------
