@@ -11,10 +11,11 @@
   <property name="ivy.jar.dir" value="${project.dir}/ivy" />
 
 
-  <property name="build.dir" value="${project.dir}/bin" />
+  <property name="main.build.dir" value="${project.dir}/bin/main" />
+  <property name="test.build.dir" value="${project.dir}/bin/test" />
   <property name="src.dir" value="main/packages" />
   <property name="lib.dir" value="${project.dir}/lib" />
-  <property name="ivyreport.dir" value="${build.dir}/report" />
+  <property name="ivyreport.dir" value="${main.build.dir}/report" />
   <property name="test.dir" value="test/packages" />
   <property name="build.jar" value="${project.jarfile}" />
   <property name="src.jar" value="${project.jarfile}.src.jar" />
@@ -53,7 +54,9 @@
     <mkdir dir="${lib.dir}" />
     <mkdir dir="${src.dir}" />
     <mkdir dir="${test.dir}" />
-    <mkdir dir="${build.dir}" />
+    <mkdir dir="${main.build.dir}" />
+    <mkdir dir="${test.build.dir}" />
+
     <ivy:configure file="ivysettings.xml" />
     <ivy:retrieve pattern="${lib.dir}/[type]/[artifact].[ext]" />
     <property name="scala-library.jar" value="${lib.dir}/jar/scala-library.jar" />
@@ -62,7 +65,7 @@
         <include name="**/*.jar" />
       </fileset>
 
-      <pathelement location="${build.dir}" />
+      <pathelement location="${main.build.dir}" />
     </path>
 
     <taskdef resource="scala/tools/ant/antlib.xml">
@@ -74,13 +77,13 @@
   </target>
 
   <target name="compile-java" depends="init">
-    <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" includeantruntime="false" >
+    <javac srcdir="${src.dir}" destdir="${main.build.dir}" classpathref="build.classpath" includeantruntime="false" >
       <include name="**/*.java" />
     </javac>
   </target>
   
   <target name="compile-scala" depends="init">
-    <scalac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath">
+    <scalac srcdir="${src.dir}" destdir="${main.build.dir}" classpathref="build.classpath">
       <include name="**/*.scala" />
     </scalac>
   </target>
@@ -95,13 +98,13 @@
     </pathconvert>
   	
   	<manifestclasspath property="dist.manifest.classpath"
-      jarfile="${build.dir}/${build.jar}">
+      jarfile="${main.build.dir}/${build.jar}">
       <classpath refid="build.classpath" />
     </manifestclasspath>
   	
     <!-- Binaries -->
-    <jar destfile="${build.dir}/${build.jar}" excludes="**/package.html"
-      basedir="${build.dir}" includes="**/*.class">
+    <jar destfile="${main.build.dir}/${build.jar}" excludes="**/package.html"
+      basedir="${main.build.dir}" includes="**/*.class">
       <fileset dir="${src.dir}" includes="*.*" />
       <!-- uncomment this if you want all lib jars be copied into dest jar (wont 
         do much - you still need to run it with java -jar somejar.jar to run anyway --> 
@@ -120,10 +123,10 @@
   </target>
 
   <target name="test-compile" depends="compile">
-    <javac srcdir="${test.dir}" destdir="${build.dir}" classpathref="build.classpath">
+    <javac srcdir="${test.dir}" destdir="${test.build.dir}" classpathref="build.classpath">
       <include name="**/*.java" />
     </javac>
-    <scalac srcdir="${test.dir}" destdir="${build.dir}"
+    <scalac srcdir="${test.dir}" destdir="${test.build.dir}"
       classpathref="build.classpath">
       <include name="**/*.scala" />
     </scalac>
@@ -134,12 +137,20 @@
       <classpath refid="build.classpath" />
     </taskdef>
 
-    <scalatest parallel="true">
-      <reporter type="stdout" />
-      <reporter type="file" filename="${build.dir}/test.out" />
-      <reporter type="graphic" />
 
-      <suite classname="ldc.unfuse.GrepTest" />
+    <path id="test.classes">
+      <fileset dir="${test.build.dir}">
+        <include name="**/*.class" />
+      </fileset>
+
+      <pathelement location="${test.build.dir}" />
+    </path>
+
+    <scalatest suffixes="Test">
+        <runpath>
+            <pathelement location="${build.dir}"/>
+            <pathelement location="${test.build.dir}"/>
+        </runpath>
     </scalatest>
 
   </target>
@@ -150,7 +161,7 @@
   <!-- ================================= target: clean ================================= -->
   <target name="clean" depends="clean-cache" description="--> clean the project">
     <delete includeemptydirs="true" quiet="true">
-      <fileset dir="${build.dir}" />
+      <fileset dir="${main.build.dir}" />
     </delete>
   </target>
   
