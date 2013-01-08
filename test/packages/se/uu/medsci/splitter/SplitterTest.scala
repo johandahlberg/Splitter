@@ -3,7 +3,7 @@ package se.uu.medsci.splitter
 import org.scalatest.FeatureSpec
 import org.scalatest.GivenWhenThen
 
-class TestSplitter extends FeatureSpec with GivenWhenThen with TestResources{
+class SplitterTest extends FeatureSpec with GivenWhenThen with TestResources{
 
     feature("The user want to split a file") {
         scenario("he/she provides a fastq file") {

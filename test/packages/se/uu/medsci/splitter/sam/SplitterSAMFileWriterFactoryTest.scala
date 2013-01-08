@@ -10,7 +10,7 @@ import net.sf.samtools.SAMRecord
 import se.uu.medsci.splitter.SplitterWriter
 import se.uu.medsci.splitter.SplitterException
 
-class TestSplitterSAMFileWriterFactory extends FlatSpec {
+class SplitterSAMFileWriterFactoryTest extends FlatSpec {
 
     val header = new SAMFileHeader()
     val presorted = true

@@ -5,7 +5,7 @@ import java.io.File
 import net.sf.picard.fastq.FastqRecord
 import net.sf.samtools.SAMRecord
 
-class TestSimpleFileSplitter extends FlatSpec with TestResources{
+class SimpleFileSplitterTest extends FlatSpec with TestResources{
 
     "A SimpleFileSplitter" should "return the correct type of file splitter if it gets a fastq file" in {
 

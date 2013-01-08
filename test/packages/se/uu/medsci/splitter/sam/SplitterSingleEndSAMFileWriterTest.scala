@@ -16,7 +16,7 @@ import net.sf.samtools.SAMRecordSetBuilder
  * Add some tests actually looking at the output file, making sure that the correct reads were written.
  */
 
-class TestSplitterSingleEndSAMFileWriter extends FlatSpec {
+class SplitterSingleEndSAMFileWriterTest extends FlatSpec {
 
     val file = File.createTempFile("testingsam", ".bam")
     val samRecordFactory = new SAMRecordSetBuilder(true, SortOrder.coordinate)

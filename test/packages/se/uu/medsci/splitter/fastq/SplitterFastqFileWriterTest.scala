@@ -5,7 +5,7 @@ import java.io.File
 import net.sf.picard.fastq._
 import collection.JavaConversions._
 
-class TestSplitterFastqFileWriter extends FlatSpec{
+class SplitterFastqFileWriterTest extends FlatSpec{
 
     // Setting up for the tests
     val file = File.createTempFile("testningfastq", ".fastq.gz")

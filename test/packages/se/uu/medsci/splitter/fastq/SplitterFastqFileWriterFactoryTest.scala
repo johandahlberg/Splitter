@@ -8,7 +8,7 @@ import net.sf.picard.fastq.FastqRecord
 import se.uu.medsci.splitter.SplitterException
 import se.uu.medsci.splitter.SplitterWriter
 
-class TestSplitterFastqFileWriterFactory extends FlatSpec {
+class SplitterFastqFileWriterFactoryTest extends FlatSpec {
 
     "A SplitterFastqFileWriterFactory" should "return a FastqFileWriter" in {
         val factory = new SplitterFastqFileWriterFactory        

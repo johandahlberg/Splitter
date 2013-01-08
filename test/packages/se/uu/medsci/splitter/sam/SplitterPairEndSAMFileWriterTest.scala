@@ -13,7 +13,7 @@ import net.sf.samtools.SAMFileWriterFactory
 import net.sf.samtools.SAMRecord
 import net.sf.samtools.SAMRecordSetBuilder
 
-class TestSplitterPairEndSAMFileWriter extends FlatSpec with BeforeAndAfter {
+class SplitterPairEndSAMFileWriterTest extends FlatSpec with BeforeAndAfter {
 
     val file = File.createTempFile("testingsam", ".bam")
     var samRecordFactory = new SAMRecordSetBuilder(true, SortOrder.coordinate)
